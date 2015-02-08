@@ -4,12 +4,12 @@ import threading
 import sqlite3
 import os
 
-from PySide import QtCore
-from PySide.QtNetwork import QTcpServer
-from PySide.QtNetwork import QTcpSocket
-from PySide.QtNetwork import QHostAddress
-from PySide.QtCore import QObject
-from PySide.QtCore import QTimer
+from PyQt4 import QtCore
+from PyQt4.QtNetwork import QTcpServer
+from PyQt4.QtNetwork import QTcpSocket
+from PyQt4.QtNetwork import QHostAddress
+from PyQt4.QtCore import QObject
+from PyQt4.QtCore import QTimer
 
 APPLOCK = threading.Lock()
 
@@ -23,10 +23,10 @@ class Server(QTcpServer):
         
         # It is possible that such port is not available.
         if started:
-            print 'Listening on port %s' % port
+            print ('Listening on port %s' % port)
             
         else:
-            print 'Could not bind port %s' % port
+            print ('Could not bind port %s' % port)
         
         # This dictionary will always contains a reference to all 
         #current sockets.
@@ -57,7 +57,7 @@ class Server(QTcpServer):
         self.sockets[rand_id] = newsocket
         newsocket.setId(rand_id)
         
-    @QtCore.Slot(str)
+    @QtCore.pyqtSlot(str)
     def readSocket(self, socket_id):
         """
         Handles a write event from a client.
@@ -67,7 +67,7 @@ class Server(QTcpServer):
             readysocket = self.sockets.get(socket_id)
             socket_info = readysocket.readAll()
             
-            print 'Socket Info: %s' % socket_info.data()
+            print ('Socket Info: %s' % socket_info.data() )
             
             # Create a thread for handling the data, emit 'ready' when done inside run(), 
             # so 'socketReady' gets called.
@@ -76,9 +76,9 @@ class Server(QTcpServer):
             socket_thread.start()
             
         except KeyError:
-            print 'Error, socket not in queue.'
+            print ('Error, socket not in queue.')
 
-    @QtCore.Slot(str)
+    @QtCore.pyqtSlot(str)
     def closeSocket(self, socket_id):
         """
         Handles a socket disconnection.
@@ -86,12 +86,12 @@ class Server(QTcpServer):
         try:
             closedsocket = self.sockets.pop(socket_id)
                  
-            print 'Socket closed: %s' % socket_id
+            print ('Socket closed: %s' % socket_id)
     
         except KeyError:
-            print 'Error, socket not in queue.'
+            print ('Error, socket not in queue.')
           
-    @QtCore.Slot(str, str)
+    @QtCore.pyqtSlot(str, str)
     def socketReady(self, socket_id, text):
         """
         Triggered from the threads when they are done
@@ -108,14 +108,14 @@ class Server(QTcpServer):
             # to the peer.
             #in_socket.write("Reply")
             
-            print "Message: '%r' from socket %s has been processed." % (str(text), socket_id)
+            print ("Message: '%r' from socket %s has been processed." % (str(text), socket_id))
             
         except KeyError:
-            print 'Error, socket not in queue.'
+            print ('Error, socket not in queue.')
           
 class Socket(QTcpSocket):
-    readyReadId = QtCore.Signal((str,))
-    disconnectedId = QtCore.Signal((str,))
+    readyReadId = QtCore.pyqtSignal((str,))
+    disconnectedId = QtCore.pyqtSignal((str,))
     
     def __init__(self, parent = None):
         QTcpSocket.__init__(self, parent)
@@ -128,7 +128,7 @@ class Socket(QTcpSocket):
     def setId(self, socket_id):
         self.id = socket_id
         
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def onReadyRead(self):
         """
         Re-emits a ready signal that sends the ID, so the Server knows
@@ -136,7 +136,7 @@ class Socket(QTcpSocket):
         """
         self.readyReadId.emit(self.id)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def onDisconnected(self):
         """
         Re-emits a ready signal that tells the server that the client
@@ -168,7 +168,7 @@ class ThreadAction(threading.Thread):
         
         # Passing the socket_id as first parameter is mandatory, 
         # second argument can be any string.
-        self.signaler.signalReady(self.socket_id, self.socket_info.data())
+        self.signaler.signalReady(self.socket_id, self.socket_info.data().decode("utf-8"))
         ##APPLOCK.release()
 
 class Signaler(QObject):
@@ -176,7 +176,7 @@ class Signaler(QObject):
     Class for using QObject signals to communicate 
     threads with main program.
     """
-    ready = QtCore.Signal((str, str,))
+    ready = QtCore.pyqtSignal((str, str,))
     
     def __init__(self, parent = None):
         QObject.__init__(self, parent)

@@ -1,14 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 import signal
 
-from PySide.QtCore import QCoreApplication
+from PyQt4.QtCore import QCoreApplication
 
 from threadedserver import Server
 
 def exit_handler(signal, frame):
-    print 'Exiting!'
+    print ('Exiting!')
     sys.exit(0)
 
 def main():
