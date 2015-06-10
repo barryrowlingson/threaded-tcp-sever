@@ -1,8 +1,6 @@
 import random
 import string
 import threading
-import sqlite3
-import os
 
 from PyQt4 import QtCore
 from PyQt4.QtNetwork import QTcpServer
@@ -64,7 +62,11 @@ class Server(QTcpServer):
         """
         try:
             # Takes the socket from the dictionary, using the socket_id, then read the data.
-            readysocket = self.sockets.get(socket_id)
+            readysocket = self.sockets.get(str(socket_id))
+            print ("socket id: " + socket_id)
+            #print (self.sockets.has_key(str(socket_id)))
+            print (self.sockets)
+
             socket_info = readysocket.readAll()
             
             print ('Socket Info: %s' % socket_info.data() )
