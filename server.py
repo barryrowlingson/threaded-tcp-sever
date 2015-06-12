@@ -1,22 +1,21 @@
 #!/usr/bin/python3
 
 import sys
-import signal
+#import signal
 
 from PyQt4.QtCore import QCoreApplication
 
 from threadedserver import Server
 
-def exit_handler(signal, frame):
+def exit_handler(*args):
     print ('Exiting!')
     sys.exit(0)
 
-def main():
+if __name__ == '__main__':
     app = QCoreApplication(sys.argv)
     server = Server()
     
-    signal.signal(signal.SIGINT, exit_handler)
-    return app.exec_()
+    #signal.signal(signal.SIGINT, exit_handler)
+    sys.exit(app.exec_())
     
-if __name__ == '__main__':
-    main()
+

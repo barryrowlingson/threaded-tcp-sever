@@ -15,16 +15,19 @@ class Server(QTcpServer):
     def __init__(self, parent = None):
         QTcpServer.__init__(self, parent)   
         
+        # define verbose variable
+        self.verbose = True
+        
         # Starts listening on selected port.
         port = 32000
         started = self.listen(address = QHostAddress.Any, port = port)
         
         # It is possible that such port is not available.
         if started:
-            print ('Listening on port %s' % port)
+            print ('[*] Listening on port %s' % port)
             
         else:
-            print ('Could not bind port %s' % port)
+            print ('[*] Could not bind port %s' % port)
         
         # This dictionary will always contains a reference to all 
         #current sockets.
@@ -55,6 +58,10 @@ class Server(QTcpServer):
         self.sockets[rand_id] = newsocket
         newsocket.setId(rand_id)
         
+        if self.verbose:
+			print('[*] New incoming connection %s from ip %s' % (rand_id, newsocket.peerAddress().toString()))
+			#print(newsocket.peerAddress().toString())
+        
     @QtCore.pyqtSlot(str)
     def readSocket(self, socket_id):
         """
@@ -63,13 +70,15 @@ class Server(QTcpServer):
         try:
             # Takes the socket from the dictionary, using the socket_id, then read the data.
             readysocket = self.sockets.get(str(socket_id))
-            print ("socket id: " + socket_id)
+            #readysocket = self.sockets.get(socket_id)
+            #print ("socket id: " + socket_id)
             #print (self.sockets.has_key(str(socket_id)))
-            print (self.sockets)
+            #print (self.sockets)
 
             socket_info = readysocket.readAll()
             
-            print ('Socket Info: %s' % socket_info.data() )
+            if self.verbose:
+				print ("[*] Socket '%s' sent data: %s" % ( socket_id, socket_info.data()) )
             
             # Create a thread for handling the data, emit 'ready' when done inside run(), 
             # so 'socketReady' gets called.
@@ -88,10 +97,10 @@ class Server(QTcpServer):
         try:
             closedsocket = self.sockets.pop(socket_id)
                  
-            print ('Socket closed: %s' % socket_id)
+            print ('[*] Socket closed: %s' % socket_id)
     
         except KeyError:
-            print ('Error, socket not in queue.')
+            print ('[*] Error, socket not in queue.')
           
     @QtCore.pyqtSlot(str, str)
     def socketReady(self, socket_id, text):
