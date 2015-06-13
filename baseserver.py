@@ -1,12 +1,10 @@
 import random
 import string
-#import threading
 
 from PyQt4 import QtCore
 from PyQt4.QtNetwork import QTcpServer, QTcpSocket, QHostAddress
-from PyQt4.QtCore import QObject#, QTimer
+from PyQt4.QtCore import QObject
 
-#APPLOCK = threading.Lock()
 
 class Server(QTcpServer):
     def __init__(self, listen_port, parent = None):
@@ -76,13 +74,7 @@ class Server(QTcpServer):
             
             if self.verbose:
 				print ("[*] Socket '%s' sent data: %s" % ( socket_id, socket_info.data()) )
-            
-            # Create a thread for handling the data, emit 'ready' when done inside run(), 
-            # so 'socketReady' gets called.
-            #socket_thread = ThreadAction(socket_info, socket_id)
-            #socket_thread.signaler.ready.connect(self.socketReady)
-            #socket_thread.start()
-            
+                      
         except KeyError:
             print ('[*] Error, socket not in queue.')
 
@@ -151,44 +143,3 @@ class Socket(QTcpSocket):
         closed the socket.
         """
         self.disconnectedId.emit(self.id)
-
-'''class ThreadAction(threading.Thread):
-    """
-    Thread class based on Python's standard threading class.
-    """
-    def __init__(self, socket_info, socket_id):
-        threading.Thread.__init__(self)
-        
-        # Includes the unique id and the message.
-        self.socket_id = socket_id
-        self.socket_info = socket_info
-        
-        # QObject object for signaling purposes. 
-        self.signaler = Signaler()
-    
-    def run(self):
-        ##APPLOCK.acquire()
-        
-        ##
-        ## Do something with the socket_info (message) 
-        ## and don't forget to signal 'ready'.
-        ##
-        
-        # Passing the socket_id as first parameter is mandatory, 
-        # second argument can be any string.
-        self.signaler.signalReady(self.socket_id, self.socket_info.data().decode("utf-8"))
-        ##APPLOCK.release()
-
-class Signaler(QObject):
-    """
-    Class for using QObject signals to communicate 
-    threads with main program.
-    """
-    ready = QtCore.pyqtSignal((str, str,))
-    
-    def __init__(self, parent = None):
-        QObject.__init__(self, parent)
-     
-    def signalReady(self, socket_id, text):
-        self.ready.emit(socket_id, text)'''
-        

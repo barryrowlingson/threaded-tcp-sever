@@ -1,10 +1,7 @@
-import random
-import string
 import threading
 
 from PyQt4 import QtCore
-from PyQt4.QtNetwork import QTcpServer, QTcpSocket, QHostAddress
-from PyQt4.QtCore import QObject, QTimer
+from PyQt4.QtCore import QObject
 from baseserver import Server
 
 APPLOCK = threading.Lock()
@@ -25,10 +22,6 @@ class ThreadedServer(Server):
         try:
             # Takes the socket from the dictionary, using the socket_id, then read the data.
             readysocket = self.sockets.get(str(socket_id))
-            #readysocket = self.sockets.get(socket_id)
-            #print ("socket id: " + socket_id)
-            #print (self.sockets.has_key(str(socket_id)))
-            #print (self.sockets)
 
             socket_info = readysocket.readAll()
             
