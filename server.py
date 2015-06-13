@@ -5,7 +5,7 @@ import sys
 
 from PyQt4.QtCore import QCoreApplication
 
-from threadedserver import Server
+from threadedserver import ThreadedServer
 
 def exit_handler(*args):
     print ('Exiting!')
@@ -13,7 +13,7 @@ def exit_handler(*args):
 
 if __name__ == '__main__':
     app = QCoreApplication(sys.argv)
-    server = Server()
+    server = ThreadedServer(listen_port=32000)
     
     #signal.signal(signal.SIGINT, exit_handler)
     sys.exit(app.exec_())
